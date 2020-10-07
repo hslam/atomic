@@ -22,50 +22,25 @@ func NewBool(val bool) *Bool {
 
 // Swap atomically stores new into *addr and returns the previous *addr value.
 func (addr *Bool) Swap(new bool) (old bool) {
-	return SwapBool(addr, new)
-}
-
-// CompareAndSwap executes the compare-and-swap operation for an bool value.
-func (addr *Bool) CompareAndSwap(old, new bool) (swapped bool) {
-	return CompareAndSwapBool(addr, old, new)
-}
-
-// Add atomically adds delta to *addr and returns the new value.
-func (addr *Bool) Add(delta bool) (new bool) {
-	return AddBool(addr, delta)
-}
-
-// Load atomically loads *addr.
-func (addr *Bool) Load() (val bool) {
-	return LoadBool(addr)
-}
-
-// Store atomically stores val into *addr.
-func (addr *Bool) Store(val bool) {
-	StoreBool(addr, val)
-}
-
-// SwapBool atomically stores new into *addr and returns the previous *addr value.
-func SwapBool(addr *Bool, new bool) (old bool) {
 	for {
 		if !atomic.CompareAndSwapUint32(&addr.seting, 0, 1) {
 			continue
 		}
-		old = LoadBool(addr)
-		StoreBool(addr, new)
+		old = addr.Load()
+		addr.Store(new)
 		atomic.StoreUint32(&addr.seting, 0)
 		return
 	}
 }
 
-// CompareAndSwapBool executes the compare-and-swap operation for an bool value.
-func CompareAndSwapBool(addr *Bool, old, new bool) (swapped bool) {
+// CompareAndSwap executes the compare-and-swap operation for an bool value.
+func (addr *Bool) CompareAndSwap(old, new bool) (swapped bool) {
 	for {
 		if !atomic.CompareAndSwapUint32(&addr.seting, 0, 1) {
 			continue
 		}
-		if LoadBool(addr) == old {
-			StoreBool(addr, new)
+		if addr.Load() == old {
+			addr.Store(new)
 			atomic.StoreUint32(&addr.seting, 0)
 			return true
 		}
@@ -74,29 +49,29 @@ func CompareAndSwapBool(addr *Bool, old, new bool) (swapped bool) {
 	}
 }
 
-// AddBool atomically adds delta to *addr and returns the new value.
-func AddBool(addr *Bool, delta bool) (new bool) {
+// Add atomically adds delta to *addr and returns the new value.
+func (addr *Bool) Add(delta bool) (new bool) {
 	for {
 		if !atomic.CompareAndSwapUint32(&addr.seting, 0, 1) {
 			continue
 		}
-		new = LoadBool(addr) && delta
-		StoreBool(addr, new)
+		new = addr.Load() && delta
+		addr.Store(new)
 		atomic.StoreUint32(&addr.seting, 0)
 		return
 	}
 }
 
-// LoadBool atomically loads *addr.
-func LoadBool(addr *Bool) (val bool) {
+// Load atomically loads *addr.
+func (addr *Bool) Load() (val bool) {
 	if atomic.LoadUint32(&addr.v) == 1 {
 		return true
 	}
 	return false
 }
 
-// StoreBool atomically stores val into *addr.
-func StoreBool(addr *Bool, val bool) {
+// Store atomically stores val into *addr.
+func (addr *Bool) Store(val bool) {
 	if val {
 		atomic.StoreUint32(&addr.v, 1)
 	} else {
