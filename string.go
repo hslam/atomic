@@ -4,12 +4,14 @@ import (
 	"sync/atomic"
 )
 
+// String represents an string.
 type String struct {
 	v       *atomic.Value
 	seting  uint32
 	initing uint32
 }
 
+// NewString returns a new String.
 func NewString(val string) *String {
 	addr := &String{v: &atomic.Value{}}
 	addr.Store(val)
@@ -98,16 +100,20 @@ func LoadString(addr *String) (val string) {
 // StoreString atomically stores val into *addr.
 func StoreString(addr *String, val string) {
 	if addr.v == nil {
-		for {
-			if !atomic.CompareAndSwapUint32(&addr.initing, 0, 1) {
-				continue
-			}
-			if addr.v == nil {
-				addr.v = &atomic.Value{}
-			}
-			atomic.StoreUint32(&addr.initing, 0)
-			break
-		}
+		initString(addr)
 	}
 	addr.v.Store(val)
+}
+
+func initString(addr *String) {
+	for {
+		if !atomic.CompareAndSwapUint32(&addr.initing, 0, 1) {
+			continue
+		}
+		if addr.v == nil {
+			addr.v = &atomic.Value{}
+		}
+		atomic.StoreUint32(&addr.initing, 0)
+		break
+	}
 }
