@@ -2,6 +2,12 @@
 Package atomic provides low-level atomic memory primitives useful for implementing synchronization algorithms.
 
 ## Feature
+* Int8
+* Int16
+* Uint8
+* Uint16
+* Float32
+* Float64
 * Bool
 * String
 * Bytes
