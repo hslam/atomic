@@ -33,18 +33,18 @@ func (v *Value) Load() (x interface{}) {
 // Store of an inconsistent type panics, as does Store(nil).
 func (v *Value) Store(x interface{}) {
 	if v.v == nil {
-		initValue(v)
+		v.init()
 	}
 	v.v.Store(x)
 }
 
-func initValue(addr *Value) {
+func (v *Value) init() {
 	for {
-		if addr.v != nil {
+		if v.v != nil {
 			break
 		}
-		if atomic.CompareAndSwapUint32(&addr.inited, 0, 1) {
-			addr.v = &atomic.Value{}
+		if atomic.CompareAndSwapUint32(&v.inited, 0, 1) {
+			v.v = &atomic.Value{}
 		}
 	}
 }

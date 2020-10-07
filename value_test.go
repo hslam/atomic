@@ -28,7 +28,7 @@ func TestInitValue(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			initValue(addr)
+			addr.init()
 			if addr.v == nil {
 				t.Error("should not be nil")
 			}
