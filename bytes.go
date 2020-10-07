@@ -10,14 +10,13 @@ import (
 
 // Bytes represents an []byte.
 type Bytes struct {
-	v      *atomic.Value
+	v      Value
 	seting uint32
-	inited uint32
 }
 
 // NewBytes returns a new Bytes.
 func NewBytes(val []byte) *Bytes {
-	addr := &Bytes{v: &atomic.Value{}}
+	addr := &Bytes{}
 	addr.Store(val)
 	return addr
 }
@@ -91,31 +90,14 @@ func AddBytes(addr *Bytes, delta []byte) (new []byte) {
 
 // LoadBytes atomically loads *addr.
 func LoadBytes(addr *Bytes) (val []byte) {
-	if addr.v == nil {
+	v := addr.v.Load()
+	if v == nil {
 		return nil
 	}
-	var ok bool
-	if val, ok = addr.v.Load().([]byte); ok {
-		return val
-	}
-	return nil
+	return v.([]byte)
 }
 
 // StoreBytes atomically stores val into *addr.
 func StoreBytes(addr *Bytes, val []byte) {
-	if addr.v == nil {
-		initBytes(addr)
-	}
 	addr.v.Store(val)
-}
-
-func initBytes(addr *Bytes) {
-	for {
-		if addr.v != nil {
-			break
-		}
-		if atomic.CompareAndSwapUint32(&addr.inited, 0, 1) {
-			addr.v = &atomic.Value{}
-		}
-	}
 }

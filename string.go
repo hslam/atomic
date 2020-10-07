@@ -9,14 +9,13 @@ import (
 
 // String represents an string.
 type String struct {
-	v      *atomic.Value
+	v      Value
 	seting uint32
-	inited uint32
 }
 
 // NewString returns a new String.
 func NewString(val string) *String {
-	addr := &String{v: &atomic.Value{}}
+	addr := &String{}
 	addr.Store(val)
 	return addr
 }
@@ -90,31 +89,14 @@ func AddString(addr *String, delta string) (new string) {
 
 // LoadString atomically loads *addr.
 func LoadString(addr *String) (val string) {
-	if addr.v == nil {
+	v := addr.v.Load()
+	if v == nil {
 		return ""
 	}
-	var ok bool
-	if val, ok = addr.v.Load().(string); ok {
-		return val
-	}
-	return ""
+	return v.(string)
 }
 
 // StoreString atomically stores val into *addr.
 func StoreString(addr *String, val string) {
-	if addr.v == nil {
-		initString(addr)
-	}
 	addr.v.Store(val)
-}
-
-func initString(addr *String) {
-	for {
-		if addr.v != nil {
-			break
-		}
-		if atomic.CompareAndSwapUint32(&addr.inited, 0, 1) {
-			addr.v = &atomic.Value{}
-		}
-	}
 }

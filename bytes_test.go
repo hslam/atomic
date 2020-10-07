@@ -6,7 +6,6 @@ package atomic
 import (
 	"bytes"
 	"sync"
-	"sync/atomic"
 	"testing"
 )
 
@@ -14,10 +13,6 @@ func TestBytes(t *testing.T) {
 	var val = []byte{1, 2, 3}
 	addr := NewBytes(val)
 	if !bytes.Equal(addr.Load(), val) {
-		t.Error(addr.Load())
-	}
-	addr.v = nil
-	if !bytes.Equal(addr.Load(), []byte{}) {
 		t.Error(addr.Load())
 	}
 	addr.Store(val[:2])
@@ -44,8 +39,8 @@ func TestBytes(t *testing.T) {
 		t.Error(addr.Load())
 	}
 
-	addr = &Bytes{v: &atomic.Value{}}
-	if !bytes.Equal(addr.Load(), []byte{}) {
+	addr = &Bytes{}
+	if addr.Load() != nil || !bytes.Equal(addr.Load(), []byte{}) {
 		t.Error(addr.Load())
 	}
 }
@@ -84,22 +79,6 @@ func TestSwapBytes(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			addr.Swap(nil)
-		}()
-	}
-	wg.Wait()
-}
-
-func TestInitBytes(t *testing.T) {
-	addr := &Bytes{}
-	var wg sync.WaitGroup
-	for i := 0; i < 512; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			initBytes(addr)
-			if addr.v == nil {
-				t.Error("should not be nil")
-			}
 		}()
 	}
 	wg.Wait()
