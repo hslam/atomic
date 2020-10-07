@@ -10,9 +10,9 @@ import (
 
 // Bytes represents an []byte.
 type Bytes struct {
-	v       *atomic.Value
-	seting  uint32
-	initing uint32
+	v      *atomic.Value
+	seting uint32
+	inited uint32
 }
 
 // NewBytes returns a new Bytes.
@@ -111,13 +111,11 @@ func StoreBytes(addr *Bytes, val []byte) {
 
 func initBytes(addr *Bytes) {
 	for {
-		if !atomic.CompareAndSwapUint32(&addr.initing, 0, 1) {
-			continue
+		if addr.v != nil {
+			break
 		}
-		if addr.v == nil {
+		if atomic.CompareAndSwapUint32(&addr.inited, 0, 1) {
 			addr.v = &atomic.Value{}
 		}
-		atomic.StoreUint32(&addr.initing, 0)
-		break
 	}
 }

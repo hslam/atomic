@@ -9,9 +9,9 @@ import (
 
 // String represents an string.
 type String struct {
-	v       *atomic.Value
-	seting  uint32
-	initing uint32
+	v      *atomic.Value
+	seting uint32
+	inited uint32
 }
 
 // NewString returns a new String.
@@ -110,13 +110,11 @@ func StoreString(addr *String, val string) {
 
 func initString(addr *String) {
 	for {
-		if !atomic.CompareAndSwapUint32(&addr.initing, 0, 1) {
-			continue
+		if addr.v != nil {
+			break
 		}
-		if addr.v == nil {
+		if atomic.CompareAndSwapUint32(&addr.inited, 0, 1) {
 			addr.v = &atomic.Value{}
 		}
-		atomic.StoreUint32(&addr.initing, 0)
-		break
 	}
 }
