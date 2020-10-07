@@ -22,50 +22,25 @@ func NewUint8(val uint8) *Uint8 {
 
 // Swap atomically stores new into *addr and returns the previous *addr value.
 func (addr *Uint8) Swap(new uint8) (old uint8) {
-	return SwapUint8(addr, new)
-}
-
-// CompareAndSwap executes the compare-and-swap operation for an uint8 value.
-func (addr *Uint8) CompareAndSwap(old, new uint8) (swapped bool) {
-	return CompareAndSwapUint8(addr, old, new)
-}
-
-// Add atomically adds delta to *addr and returns the new value.
-func (addr *Uint8) Add(delta uint8) (new uint8) {
-	return AddUint8(addr, delta)
-}
-
-// Load atomically loads *addr.
-func (addr *Uint8) Load() (val uint8) {
-	return LoadUint8(addr)
-}
-
-// Store atomically stores val into *addr.
-func (addr *Uint8) Store(val uint8) {
-	StoreUint8(addr, val)
-}
-
-// SwapUint8 atomically stores new into *addr and returns the previous *addr value.
-func SwapUint8(addr *Uint8, new uint8) (old uint8) {
 	for {
 		if !atomic.CompareAndSwapUint32(&addr.seting, 0, 1) {
 			continue
 		}
-		old = LoadUint8(addr)
-		StoreUint8(addr, new)
+		old = addr.Load()
+		addr.Store(new)
 		atomic.StoreUint32(&addr.seting, 0)
 		return
 	}
 }
 
-// CompareAndSwapUint8 executes the compare-and-swap operation for an uint8 value.
-func CompareAndSwapUint8(addr *Uint8, old, new uint8) (swapped bool) {
+// CompareAndSwap executes the compare-and-swap operation for an uint8 value.
+func (addr *Uint8) CompareAndSwap(old, new uint8) (swapped bool) {
 	for {
 		if !atomic.CompareAndSwapUint32(&addr.seting, 0, 1) {
 			continue
 		}
-		if LoadUint8(addr) == old {
-			StoreUint8(addr, new)
+		if addr.Load() == old {
+			addr.Store(new)
 			atomic.StoreUint32(&addr.seting, 0)
 			return true
 		}
@@ -74,26 +49,26 @@ func CompareAndSwapUint8(addr *Uint8, old, new uint8) (swapped bool) {
 	}
 }
 
-// AddUint8 atomically adds delta to *addr and returns the new value.
-func AddUint8(addr *Uint8, delta uint8) (new uint8) {
+// Add atomically adds delta to *addr and returns the new value.
+func (addr *Uint8) Add(delta uint8) (new uint8) {
 	for {
 		if !atomic.CompareAndSwapUint32(&addr.seting, 0, 1) {
 			continue
 		}
-		new = LoadUint8(addr) + delta
-		StoreUint8(addr, new)
+		new = addr.Load() + delta
+		addr.Store(new)
 		atomic.StoreUint32(&addr.seting, 0)
 		return
 	}
 }
 
-// LoadUint8 atomically loads *addr.
-func LoadUint8(addr *Uint8) (val uint8) {
+// Load atomically loads *addr.
+func (addr *Uint8) Load() (val uint8) {
 	var v = atomic.LoadUint32(&addr.v)
 	return uint8(v)
 }
 
-// StoreUint8 atomically stores val into *addr.
-func StoreUint8(addr *Uint8, val uint8) {
+// Store atomically stores val into *addr.
+func (addr *Uint8) Store(val uint8) {
 	atomic.StoreUint32(&addr.v, uint32(val))
 }
