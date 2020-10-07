@@ -4,8 +4,12 @@ Package atomic provides low-level atomic memory primitives useful for implementi
 ## Feature
 * Int8
 * Int16
+* Int32
+* Int64
 * Uint8
 * Uint16
+* Uint32
+* Uint64
 * Float32
 * Float64
 * Bool
