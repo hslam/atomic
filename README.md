@@ -1,4 +1,8 @@
 # atomic
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/hslam/atomic)](https://pkg.go.dev/github.com/hslam/atomic)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hslam/atomic)](https://goreportcard.com/report/github.com/hslam/atomic)
+[![LICENSE](https://img.shields.io/github/license/hslam/atomic.svg?style=flat-square)](https://github.com/hslam/atomic/blob/master/LICENSE)
+
 Package atomic provides low-level atomic memory primitives useful for implementing synchronization algorithms.
 
 ## Feature
@@ -10,11 +14,14 @@ Package atomic provides low-level atomic memory primitives useful for implementi
 * Uint16
 * Uint32
 * Uint64
+* Uintptr
+* Pointer
 * Float32
 * Float64
 * Bool
 * String
 * Bytes
+* Value
 
 ## Get started
 
