@@ -35,6 +35,30 @@ go get github.com/hslam/atomic
 ```
 import "github.com/hslam/atomic"
 ```
+### Usage
+#### Example
+```
+package main
+
+import (
+	"fmt"
+	"github.com/hslam/atomic"
+)
+
+func main() {
+	str := atomic.NewString("")
+	str.Store("Hi")
+	str.Swap("Hello")
+	str.Add(" atomic")
+	str.CompareAndSwap("Hello atomic", "Hello World")
+	fmt.Println(str.Load())
+}
+```
+
+### Output
+```
+Hello World
+```
 
 ### License
 This package is licensed under a MIT license (Copyright (c) 2020 Meng Huang)
