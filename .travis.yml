@@ -7,6 +7,6 @@ install:
   - go get -t -v -d ./...
 script:
   - go test -v .
-  - go test -coverprofile=coverage.data -covermode=atomic -v
+  - go test -coverprofile=coverage.txt -covermode=atomic
 after_success:
   - bash <(curl -s https://codecov.io/bash)
