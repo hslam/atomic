@@ -21,12 +21,8 @@ func NewUint16(val uint16) *Uint16 {
 
 // Swap atomically stores new into *addr and returns the previous *addr value.
 func (addr *Uint16) Swap(new uint16) (old uint16) {
-	for {
-		old = addr.Load()
-		if addr.CompareAndSwap(old, new) {
-			return
-		}
-	}
+	var v = atomic.SwapUint32(&addr.v, uint32(new))
+	return uint16(v)
 }
 
 // CompareAndSwap executes the compare-and-swap operation for an uint16 value.

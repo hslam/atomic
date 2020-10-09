@@ -21,12 +21,8 @@ func NewUint8(val uint8) *Uint8 {
 
 // Swap atomically stores new into *addr and returns the previous *addr value.
 func (addr *Uint8) Swap(new uint8) (old uint8) {
-	for {
-		old = addr.Load()
-		if addr.CompareAndSwap(old, new) {
-			return
-		}
-	}
+	var v = atomic.SwapUint32(&addr.v, uint32(new))
+	return uint8(v)
 }
 
 // CompareAndSwap executes the compare-and-swap operation for an uint8 value.
