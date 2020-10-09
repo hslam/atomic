@@ -53,45 +53,7 @@ func (v *Value) Swap(new interface{}) (old interface{}) {
 // CompareAndSwap executes the compare-and-swap operation for an interface{} value.
 func (v *Value) CompareAndSwap(old, new interface{}) (swapped bool) {
 	if v.fast {
-		if new == nil {
-			panic("github.com/hslam/atomic: new is nil")
-		}
-		vp := (*ifaceWords)(unsafe.Pointer(&v.v))
-		np := (*ifaceWords)(unsafe.Pointer(&new))
-		for {
-			typ := LoadPointer(&vp.typ)
-			if typ == nil {
-				// Attempt to start first store.
-				// Disable preemption so that other goroutines can use
-				// active spin wait to wait for completion; and so that
-				// GC does not see the fake type accidentally.
-				if !CompareAndSwapPointer(&vp.typ, nil, unsafe.Pointer(^uintptr(0))) {
-					return false
-				}
-				// Complete first store.
-				StorePointer(&vp.data, np.data)
-				StorePointer(&vp.typ, np.typ)
-				return
-			}
-			if uintptr(typ) == ^uintptr(0) {
-				// First store in progress. Wait.
-				// Since we disable preemption around the first store,
-				// we can wait with active spinning.
-				return false
-			}
-			if old == nil {
-				panic("github.com/hslam/atomic: old is nil")
-			}
-			// First store completed. Check type and overwrite data.
-			op := (*ifaceWords)(unsafe.Pointer(&old))
-			if typ != op.typ {
-				panic("github.com/hslam/atomic: old is inconsistently typed value")
-			}
-			if typ != np.typ {
-				panic("github.com/hslam/atomic: new is inconsistently typed value")
-			}
-			return atomic.CompareAndSwapPointer(&vp.data, op.data, np.data)
-		}
+		return v.fastCompareAndSwap(old, new)
 	}
 	for {
 		if !atomic.CompareAndSwapUint32(&v.seting, 0, 1) {
@@ -104,6 +66,48 @@ func (v *Value) CompareAndSwap(old, new interface{}) (swapped bool) {
 		}
 		atomic.StoreUint32(&v.seting, 0)
 		return false
+	}
+}
+
+func (v *Value) fastCompareAndSwap(old, new interface{}) (swapped bool) {
+	if new == nil {
+		panic("github.com/hslam/atomic: new is nil")
+	}
+	vp := (*ifaceWords)(unsafe.Pointer(&v.v))
+	np := (*ifaceWords)(unsafe.Pointer(&new))
+	for {
+		typ := LoadPointer(&vp.typ)
+		if typ == nil {
+			// Attempt to start first store.
+			// Disable preemption so that other goroutines can use
+			// active spin wait to wait for completion; and so that
+			// GC does not see the fake type accidentally.
+			if !CompareAndSwapPointer(&vp.typ, nil, unsafe.Pointer(^uintptr(0))) {
+				return false
+			}
+			// Complete first store.
+			StorePointer(&vp.data, np.data)
+			StorePointer(&vp.typ, np.typ)
+			return
+		}
+		if uintptr(typ) == ^uintptr(0) {
+			// First store in progress. Wait.
+			// Since we disable preemption around the first store,
+			// we can wait with active spinning.
+			return false
+		}
+		if old == nil {
+			panic("github.com/hslam/atomic: old is nil")
+		}
+		// First store completed. Check type and overwrite data.
+		op := (*ifaceWords)(unsafe.Pointer(&old))
+		if typ != op.typ {
+			panic("github.com/hslam/atomic: old is inconsistently typed value")
+		}
+		if typ != np.typ {
+			panic("github.com/hslam/atomic: new is inconsistently typed value")
+		}
+		return atomic.CompareAndSwapPointer(&vp.data, op.data, np.data)
 	}
 }
 

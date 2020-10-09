@@ -22,9 +22,9 @@ func NewString(val string) *String {
 // Swap atomically stores new into *addr and returns the previous *addr value.
 func (addr *String) Swap(new string) (old string) {
 	for {
-		old = addr.Load()
-		if addr.CompareAndSwap(old, new) {
-			return
+		old := addr.v.Load()
+		if addr.v.fastCompareAndSwap(old, new) {
+			return old.(string)
 		}
 	}
 }
@@ -48,9 +48,9 @@ func (addr *String) CompareAndSwap(old, new string) (swapped bool) {
 // Add atomically adds delta to *addr and returns the new value.
 func (addr *String) Add(delta string) (new string) {
 	for {
-		old := addr.Load()
-		new = old + delta
-		if addr.CompareAndSwap(old, new) {
+		old := addr.v.Load()
+		new = old.(string) + delta
+		if addr.v.fastCompareAndSwap(old, new) {
 			return
 		}
 	}
