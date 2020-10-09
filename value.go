@@ -11,15 +11,14 @@ type AddFunc func(old, delta interface{}) (new interface{})
 //
 // A Value must not be copied after first use.
 type Value struct {
-	v       *atomic.Value
-	inited  uint32
+	v       atomic.Value
 	seting  uint32
 	AddFunc AddFunc
 }
 
 // NewValue returns a new Value.
 func NewValue(val interface{}, addFunc AddFunc) *Value {
-	addr := &Value{v: &atomic.Value{}, AddFunc: addFunc}
+	addr := &Value{AddFunc: addFunc}
 	addr.Store(val)
 	return addr
 }
@@ -72,9 +71,6 @@ func (v *Value) Add(delta interface{}) (new interface{}) {
 // Load returns the value set by the most recent Store.
 // It returns nil if there has been no call to Store for this Value.
 func (v *Value) Load() (x interface{}) {
-	if v.v == nil {
-		return nil
-	}
 	return v.v.Load()
 }
 
@@ -82,19 +78,5 @@ func (v *Value) Load() (x interface{}) {
 // All calls to Store for a given Value must use values of the same concrete type.
 // Store of an inconsistent type panics, as does Store(nil).
 func (v *Value) Store(x interface{}) {
-	if v.v == nil {
-		v.init()
-	}
 	v.v.Store(x)
-}
-
-func (v *Value) init() {
-	for {
-		if v.v != nil {
-			break
-		}
-		if atomic.CompareAndSwapUint32(&v.inited, 0, 1) {
-			v.v = &atomic.Value{}
-		}
-	}
 }

@@ -14,10 +14,6 @@ func TestValue(t *testing.T) {
 	if addr.Load() != val {
 		t.Error(addr.Load())
 	}
-	addr.v = nil
-	if addr.Load() != nil {
-		t.Error(addr.Load())
-	}
 	addr.Store(val[:5])
 	if addr.Load().(string) != val[:5] {
 		t.Error(addr.Load())
@@ -94,22 +90,6 @@ func TestSwapValue(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			addr.Swap("")
-		}()
-	}
-	wg.Wait()
-}
-
-func TestInitValue(t *testing.T) {
-	addr := &Value{}
-	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			addr.init()
-			if addr.v == nil {
-				t.Error("should not be nil")
-			}
 		}()
 	}
 	wg.Wait()
