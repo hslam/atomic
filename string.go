@@ -9,8 +9,7 @@ import (
 
 // String represents an string.
 type String struct {
-	v      Value
-	seting uint32
+	v Value
 }
 
 // NewString returns a new String.
@@ -23,28 +22,25 @@ func NewString(val string) *String {
 // Swap atomically stores new into *addr and returns the previous *addr value.
 func (addr *String) Swap(new string) (old string) {
 	for {
-		if !atomic.CompareAndSwapUint32(&addr.seting, 0, 1) {
-			continue
-		}
 		old = addr.Load()
-		addr.Store(new)
-		atomic.StoreUint32(&addr.seting, 0)
-		return
+		if addr.CompareAndSwap(old, new) {
+			return
+		}
 	}
 }
 
 // CompareAndSwap executes the compare-and-swap operation for an string value.
 func (addr *String) CompareAndSwap(old, new string) (swapped bool) {
 	for {
-		if !atomic.CompareAndSwapUint32(&addr.seting, 0, 1) {
+		if !atomic.CompareAndSwapUint32(&addr.v.seting, 0, 1) {
 			continue
 		}
 		if addr.Load() == old {
 			addr.Store(new)
-			atomic.StoreUint32(&addr.seting, 0)
+			atomic.StoreUint32(&addr.v.seting, 0)
 			return true
 		}
-		atomic.StoreUint32(&addr.seting, 0)
+		atomic.StoreUint32(&addr.v.seting, 0)
 		return false
 	}
 }
@@ -52,13 +48,11 @@ func (addr *String) CompareAndSwap(old, new string) (swapped bool) {
 // Add atomically adds delta to *addr and returns the new value.
 func (addr *String) Add(delta string) (new string) {
 	for {
-		if !atomic.CompareAndSwapUint32(&addr.seting, 0, 1) {
-			continue
+		old := addr.Load()
+		new = old + delta
+		if addr.CompareAndSwap(old, new) {
+			return
 		}
-		new = addr.Load() + delta
-		addr.Store(new)
-		atomic.StoreUint32(&addr.seting, 0)
-		return
 	}
 }
 

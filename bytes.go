@@ -10,8 +10,7 @@ import (
 
 // Bytes represents an []byte.
 type Bytes struct {
-	v      Value
-	seting uint32
+	v Value
 }
 
 // NewBytes returns a new Bytes.
@@ -24,28 +23,25 @@ func NewBytes(val []byte) *Bytes {
 // Swap atomically stores new into *addr and returns the previous *addr value.
 func (addr *Bytes) Swap(new []byte) (old []byte) {
 	for {
-		if !atomic.CompareAndSwapUint32(&addr.seting, 0, 1) {
-			continue
-		}
 		old = addr.Load()
-		addr.Store(new)
-		atomic.StoreUint32(&addr.seting, 0)
-		return
+		if addr.CompareAndSwap(old, new) {
+			return
+		}
 	}
 }
 
 // CompareAndSwap executes the compare-and-swap operation for an []byte value.
 func (addr *Bytes) CompareAndSwap(old, new []byte) (swapped bool) {
 	for {
-		if !atomic.CompareAndSwapUint32(&addr.seting, 0, 1) {
+		if !atomic.CompareAndSwapUint32(&addr.v.seting, 0, 1) {
 			continue
 		}
 		if bytes.Equal(addr.Load(), old) {
 			addr.Store(new)
-			atomic.StoreUint32(&addr.seting, 0)
+			atomic.StoreUint32(&addr.v.seting, 0)
 			return true
 		}
-		atomic.StoreUint32(&addr.seting, 0)
+		atomic.StoreUint32(&addr.v.seting, 0)
 		return false
 	}
 }
@@ -53,13 +49,11 @@ func (addr *Bytes) CompareAndSwap(old, new []byte) (swapped bool) {
 // Add atomically adds delta to *addr and returns the new value.
 func (addr *Bytes) Add(delta []byte) (new []byte) {
 	for {
-		if !atomic.CompareAndSwapUint32(&addr.seting, 0, 1) {
-			continue
+		old := addr.Load()
+		new = append(old, delta...)
+		if addr.CompareAndSwap(old, new) {
+			return
 		}
-		new = append(addr.Load(), delta...)
-		addr.Store(new)
-		atomic.StoreUint32(&addr.seting, 0)
-		return
 	}
 }
 

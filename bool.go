@@ -21,12 +21,8 @@ func NewBool(val bool) *Bool {
 
 // Swap atomically stores new into *addr and returns the previous *addr value.
 func (addr *Bool) Swap(new bool) (old bool) {
-	for {
-		old = addr.Load()
-		if addr.CompareAndSwap(old, new) {
-			return
-		}
-	}
+	var v = atomic.SwapUint32(&addr.v, boolToUint32(new))
+	return uint32ToBool(v)
 }
 
 // CompareAndSwap executes the compare-and-swap operation for an bool value.
