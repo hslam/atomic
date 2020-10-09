@@ -41,7 +41,7 @@ func TestFloat32(t *testing.T) {
 func TestAddFloat32(t *testing.T) {
 	addr := NewFloat32(0.1)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -54,7 +54,7 @@ func TestAddFloat32(t *testing.T) {
 func TestCompareAndSwapFloat32(t *testing.T) {
 	addr := NewFloat32(0.1)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -67,7 +67,7 @@ func TestCompareAndSwapFloat32(t *testing.T) {
 func TestSwapFloat32(t *testing.T) {
 	addr := NewFloat32(0.1)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

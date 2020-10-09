@@ -41,7 +41,7 @@ func TestInt8(t *testing.T) {
 func TestAddInt8(t *testing.T) {
 	addr := NewInt8(1)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -54,7 +54,7 @@ func TestAddInt8(t *testing.T) {
 func TestCompareAndSwapInt8(t *testing.T) {
 	addr := NewInt8(1)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -67,7 +67,7 @@ func TestCompareAndSwapInt8(t *testing.T) {
 func TestSwapInt8(t *testing.T) {
 	addr := NewInt8(1)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

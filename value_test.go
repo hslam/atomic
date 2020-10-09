@@ -58,7 +58,7 @@ func TestAddValue(t *testing.T) {
 	}()
 	addr.AddFunc = addFunc
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -71,7 +71,7 @@ func TestAddValue(t *testing.T) {
 func TestCompareAndSwapValue(t *testing.T) {
 	addr := NewValue("", nil)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -84,7 +84,7 @@ func TestCompareAndSwapValue(t *testing.T) {
 func TestSwapValue(t *testing.T) {
 	addr := NewValue("", nil)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -185,7 +185,7 @@ func TestAddFastValue(t *testing.T) {
 	}()
 	addr.AddFunc = addFunc
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -209,7 +209,7 @@ func testCompareAndSwapFastValue(t *testing.T) {
 }
 
 func TestCompareAndSwapFastValue(t *testing.T) {
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		testCompareAndSwapFastValue(t)
 	}
 	addr := &Value{fast: true}
@@ -251,7 +251,7 @@ func TestCompareAndSwapFastValue(t *testing.T) {
 func TestSwapFastValue(t *testing.T) {
 	addr := NewValue("", nil)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

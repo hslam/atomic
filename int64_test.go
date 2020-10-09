@@ -41,7 +41,7 @@ func TestInt64(t *testing.T) {
 func TestAddInt64(t *testing.T) {
 	addr := NewInt64(1)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -54,7 +54,7 @@ func TestAddInt64(t *testing.T) {
 func TestCompareAndSwapInt64(t *testing.T) {
 	addr := NewInt64(1)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -67,7 +67,7 @@ func TestCompareAndSwapInt64(t *testing.T) {
 func TestSwapInt64(t *testing.T) {
 	addr := NewInt64(1)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

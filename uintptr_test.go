@@ -41,7 +41,7 @@ func TestUintptr(t *testing.T) {
 func TestAddUintptr(t *testing.T) {
 	addr := NewUintptr(1)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -54,7 +54,7 @@ func TestAddUintptr(t *testing.T) {
 func TestCompareAndSwapUintptr(t *testing.T) {
 	addr := NewUintptr(1)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -67,7 +67,7 @@ func TestCompareAndSwapUintptr(t *testing.T) {
 func TestSwapUintptr(t *testing.T) {
 	addr := NewUintptr(1)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

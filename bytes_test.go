@@ -48,7 +48,7 @@ func TestBytes(t *testing.T) {
 func TestAddBytes(t *testing.T) {
 	addr := NewBytes(nil)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -61,7 +61,7 @@ func TestAddBytes(t *testing.T) {
 func TestCompareAndSwapBytes(t *testing.T) {
 	addr := NewBytes(nil)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -74,7 +74,7 @@ func TestCompareAndSwapBytes(t *testing.T) {
 func TestSwapBytes(t *testing.T) {
 	addr := NewBytes(nil)
 	var wg sync.WaitGroup
-	for i := 0; i < 16382; i++ {
+	for i := 0; i < 8192; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
