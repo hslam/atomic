@@ -83,3 +83,38 @@ func TestSwapBytes(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+func BenchmarkSwapBytes(b *testing.B) {
+	addr := NewBytes(nil)
+	for i := 0; i < b.N; i++ {
+		addr.Swap(nil)
+	}
+}
+
+func BenchmarkCompareAndSwapBytes(b *testing.B) {
+	addr := NewBytes(nil)
+	for i := 0; i < b.N; i++ {
+		addr.CompareAndSwap(nil, nil)
+	}
+}
+
+func BenchmarkAddBytes(b *testing.B) {
+	addr := NewBytes(nil)
+	for i := 0; i < b.N; i++ {
+		addr.Add(nil)
+	}
+}
+
+func BenchmarkStoreBytes(b *testing.B) {
+	addr := NewBytes(nil)
+	for i := 0; i < b.N; i++ {
+		addr.Store(nil)
+	}
+}
+
+func BenchmarkLoadBytes(b *testing.B) {
+	addr := NewBytes(nil)
+	for i := 0; i < b.N; i++ {
+		addr.Load()
+	}
+}

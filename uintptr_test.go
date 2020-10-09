@@ -76,3 +76,38 @@ func TestSwapUintptr(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+func BenchmarkSwapUintptr(b *testing.B) {
+	addr := NewUintptr(1)
+	for i := 0; i < b.N; i++ {
+		addr.Swap(1)
+	}
+}
+
+func BenchmarkCompareAndSwapUintptr(b *testing.B) {
+	addr := NewUintptr(1)
+	for i := 0; i < b.N; i++ {
+		addr.CompareAndSwap(1, 2)
+	}
+}
+
+func BenchmarkAddUintptr(b *testing.B) {
+	addr := NewUintptr(1)
+	for i := 0; i < b.N; i++ {
+		addr.Add(1)
+	}
+}
+
+func BenchmarkStoreUintptr(b *testing.B) {
+	addr := NewUintptr(1)
+	for i := 0; i < b.N; i++ {
+		addr.Store(1)
+	}
+}
+
+func BenchmarkLoadUintptr(b *testing.B) {
+	addr := NewUintptr(1)
+	for i := 0; i < b.N; i++ {
+		addr.Load()
+	}
+}

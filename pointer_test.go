@@ -33,3 +33,45 @@ func TestPointer(t *testing.T) {
 		t.Log(addr.Load())
 	}
 }
+
+func BenchmarkSwapPointer(b *testing.B) {
+	var v string
+	var vp = unsafe.Pointer(&v)
+	var addr = NewPointer(vp)
+	var v1 = "Hello World"
+	var vp1 = unsafe.Pointer(&v1)
+	for i := 0; i < b.N; i++ {
+		addr.Swap(vp1)
+	}
+}
+
+func BenchmarkCompareAndSwapPointer(b *testing.B) {
+	var v string
+	var vp = unsafe.Pointer(&v)
+	var addr = NewPointer(vp)
+	var v1 = "Hello World"
+	var vp1 = unsafe.Pointer(&v1)
+	for i := 0; i < b.N; i++ {
+		addr.CompareAndSwap(vp, vp1)
+	}
+}
+
+func BenchmarkStorePointer(b *testing.B) {
+	var v string
+	var vp = unsafe.Pointer(&v)
+	var addr = NewPointer(vp)
+	var v1 = "Hello World"
+	var vp1 = unsafe.Pointer(&v1)
+	for i := 0; i < b.N; i++ {
+		addr.Store(vp1)
+	}
+}
+
+func BenchmarkLoadPointer(b *testing.B) {
+	var v string
+	var vp = unsafe.Pointer(&v)
+	var addr = NewPointer(vp)
+	for i := 0; i < b.N; i++ {
+		addr.Load()
+	}
+}

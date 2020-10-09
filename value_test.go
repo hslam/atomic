@@ -114,3 +114,41 @@ func TestInitValue(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+func BenchmarkSwapValue(b *testing.B) {
+	addr := NewValue("", nil)
+	for i := 0; i < b.N; i++ {
+		addr.Swap("")
+	}
+}
+
+func BenchmarkCompareAndSwapValue(b *testing.B) {
+	addr := NewValue("", nil)
+	for i := 0; i < b.N; i++ {
+		addr.CompareAndSwap("", "")
+	}
+}
+
+func BenchmarkAddValue(b *testing.B) {
+	var addFunc AddFunc = func(old, delta interface{}) (new interface{}) {
+		return old.(string) + delta.(string)
+	}
+	addr := NewValue("", addFunc)
+	for i := 0; i < b.N; i++ {
+		addr.Add("")
+	}
+}
+
+func BenchmarkStoreValue(b *testing.B) {
+	addr := NewValue("", nil)
+	for i := 0; i < b.N; i++ {
+		addr.Store("")
+	}
+}
+
+func BenchmarkLoadValue(b *testing.B) {
+	addr := NewValue("", nil)
+	for i := 0; i < b.N; i++ {
+		addr.Load()
+	}
+}

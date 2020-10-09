@@ -82,3 +82,38 @@ func TestSwapString(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+func BenchmarkSwapString(b *testing.B) {
+	addr := NewString("")
+	for i := 0; i < b.N; i++ {
+		addr.Swap("")
+	}
+}
+
+func BenchmarkCompareAndSwapString(b *testing.B) {
+	addr := NewString("")
+	for i := 0; i < b.N; i++ {
+		addr.CompareAndSwap("", "")
+	}
+}
+
+func BenchmarkAddString(b *testing.B) {
+	addr := NewString("")
+	for i := 0; i < b.N; i++ {
+		addr.Add("")
+	}
+}
+
+func BenchmarkStoreString(b *testing.B) {
+	addr := NewString("")
+	for i := 0; i < b.N; i++ {
+		addr.Store("")
+	}
+}
+
+func BenchmarkLoadString(b *testing.B) {
+	addr := NewString("")
+	for i := 0; i < b.N; i++ {
+		addr.Load()
+	}
+}

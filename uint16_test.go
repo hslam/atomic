@@ -76,3 +76,38 @@ func TestSwapUint16(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+func BenchmarkSwapUint16(b *testing.B) {
+	addr := NewUint16(1)
+	for i := 0; i < b.N; i++ {
+		addr.Swap(1)
+	}
+}
+
+func BenchmarkCompareAndSwapUint16(b *testing.B) {
+	addr := NewUint16(1)
+	for i := 0; i < b.N; i++ {
+		addr.CompareAndSwap(1, 2)
+	}
+}
+
+func BenchmarkAddUint16(b *testing.B) {
+	addr := NewUint16(1)
+	for i := 0; i < b.N; i++ {
+		addr.Add(1)
+	}
+}
+
+func BenchmarkStoreUint16(b *testing.B) {
+	addr := NewUint16(1)
+	for i := 0; i < b.N; i++ {
+		addr.Store(1)
+	}
+}
+
+func BenchmarkLoadUint16(b *testing.B) {
+	addr := NewUint16(1)
+	for i := 0; i < b.N; i++ {
+		addr.Load()
+	}
+}

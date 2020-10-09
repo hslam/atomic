@@ -52,7 +52,7 @@ func TestAddInt64(t *testing.T) {
 }
 
 func TestCompareAndSwapInt64(t *testing.T) {
-	addr := NewInt32(1)
+	addr := NewInt64(1)
 	var wg sync.WaitGroup
 	for i := 0; i < 512; i++ {
 		wg.Add(1)
@@ -65,7 +65,7 @@ func TestCompareAndSwapInt64(t *testing.T) {
 }
 
 func TestSwapInt64(t *testing.T) {
-	addr := NewInt32(1)
+	addr := NewInt64(1)
 	var wg sync.WaitGroup
 	for i := 0; i < 512; i++ {
 		wg.Add(1)
@@ -75,4 +75,39 @@ func TestSwapInt64(t *testing.T) {
 		}()
 	}
 	wg.Wait()
+}
+
+func BenchmarkSwapInt64(b *testing.B) {
+	addr := NewInt64(1)
+	for i := 0; i < b.N; i++ {
+		addr.Swap(1)
+	}
+}
+
+func BenchmarkCompareAndSwapInt64(b *testing.B) {
+	addr := NewInt64(1)
+	for i := 0; i < b.N; i++ {
+		addr.CompareAndSwap(1, 2)
+	}
+}
+
+func BenchmarkAddInt64(b *testing.B) {
+	addr := NewInt64(1)
+	for i := 0; i < b.N; i++ {
+		addr.Add(1)
+	}
+}
+
+func BenchmarkStoreInt64(b *testing.B) {
+	addr := NewInt64(1)
+	for i := 0; i < b.N; i++ {
+		addr.Store(1)
+	}
+}
+
+func BenchmarkLoadInt64(b *testing.B) {
+	addr := NewInt64(1)
+	for i := 0; i < b.N; i++ {
+		addr.Load()
+	}
 }

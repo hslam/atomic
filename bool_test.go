@@ -77,3 +77,38 @@ func TestSwapBool(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+func BenchmarkSwapBool(b *testing.B) {
+	addr := NewBool(false)
+	for i := 0; i < b.N; i++ {
+		addr.Swap(false)
+	}
+}
+
+func BenchmarkCompareAndSwapBool(b *testing.B) {
+	addr := NewBool(false)
+	for i := 0; i < b.N; i++ {
+		addr.CompareAndSwap(false, true)
+	}
+}
+
+func BenchmarkAddBool(b *testing.B) {
+	addr := NewBool(false)
+	for i := 0; i < b.N; i++ {
+		addr.Add(false)
+	}
+}
+
+func BenchmarkStoreBool(b *testing.B) {
+	addr := NewBool(false)
+	for i := 0; i < b.N; i++ {
+		addr.Store(false)
+	}
+}
+
+func BenchmarkLoadBool(b *testing.B) {
+	addr := NewBool(false)
+	for i := 0; i < b.N; i++ {
+		addr.Load()
+	}
+}

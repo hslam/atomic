@@ -76,3 +76,38 @@ func TestSwapUint64(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+func BenchmarkSwapUint64(b *testing.B) {
+	addr := NewUint64(1)
+	for i := 0; i < b.N; i++ {
+		addr.Swap(1)
+	}
+}
+
+func BenchmarkCompareAndSwapUint64(b *testing.B) {
+	addr := NewUint64(1)
+	for i := 0; i < b.N; i++ {
+		addr.CompareAndSwap(1, 2)
+	}
+}
+
+func BenchmarkAddUint64(b *testing.B) {
+	addr := NewUint64(1)
+	for i := 0; i < b.N; i++ {
+		addr.Add(1)
+	}
+}
+
+func BenchmarkStoreUint64(b *testing.B) {
+	addr := NewUint64(1)
+	for i := 0; i < b.N; i++ {
+		addr.Store(1)
+	}
+}
+
+func BenchmarkLoadUint64(b *testing.B) {
+	addr := NewUint64(1)
+	for i := 0; i < b.N; i++ {
+		addr.Load()
+	}
+}

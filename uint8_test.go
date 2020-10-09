@@ -76,3 +76,38 @@ func TestSwapUint8(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+func BenchmarkSwapUint8(b *testing.B) {
+	addr := NewUint8(1)
+	for i := 0; i < b.N; i++ {
+		addr.Swap(1)
+	}
+}
+
+func BenchmarkCompareAndSwapUint8(b *testing.B) {
+	addr := NewUint8(1)
+	for i := 0; i < b.N; i++ {
+		addr.CompareAndSwap(1, 2)
+	}
+}
+
+func BenchmarkAddUint8(b *testing.B) {
+	addr := NewUint8(1)
+	for i := 0; i < b.N; i++ {
+		addr.Add(1)
+	}
+}
+
+func BenchmarkStoreUint8(b *testing.B) {
+	addr := NewUint8(1)
+	for i := 0; i < b.N; i++ {
+		addr.Store(1)
+	}
+}
+
+func BenchmarkLoadUint8(b *testing.B) {
+	addr := NewUint8(1)
+	for i := 0; i < b.N; i++ {
+		addr.Load()
+	}
+}
