@@ -47,7 +47,7 @@ func TestString(t *testing.T) {
 func TestAddString(t *testing.T) {
 	addr := NewString("")
 	var wg sync.WaitGroup
-	for i := 0; i < 512; i++ {
+	for i := 0; i < 16382; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -60,7 +60,7 @@ func TestAddString(t *testing.T) {
 func TestCompareAndSwapString(t *testing.T) {
 	addr := NewString("")
 	var wg sync.WaitGroup
-	for i := 0; i < 512; i++ {
+	for i := 0; i < 16382; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -73,7 +73,7 @@ func TestCompareAndSwapString(t *testing.T) {
 func TestSwapString(t *testing.T) {
 	addr := NewString("")
 	var wg sync.WaitGroup
-	for i := 0; i < 512; i++ {
+	for i := 0; i < 16382; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

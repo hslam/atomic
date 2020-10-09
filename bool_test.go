@@ -42,7 +42,7 @@ func TestBool(t *testing.T) {
 func TestAddBool(t *testing.T) {
 	addr := NewBool(false)
 	var wg sync.WaitGroup
-	for i := 0; i < 512; i++ {
+	for i := 0; i < 16382; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -55,7 +55,7 @@ func TestAddBool(t *testing.T) {
 func TestCompareAndSwapBool(t *testing.T) {
 	addr := NewBool(false)
 	var wg sync.WaitGroup
-	for i := 0; i < 512; i++ {
+	for i := 0; i < 16382; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -68,7 +68,7 @@ func TestCompareAndSwapBool(t *testing.T) {
 func TestSwapBool(t *testing.T) {
 	addr := NewBool(false)
 	var wg sync.WaitGroup
-	for i := 0; i < 512; i++ {
+	for i := 0; i < 16382; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

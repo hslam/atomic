@@ -41,7 +41,7 @@ func TestUint16(t *testing.T) {
 func TestAddUint16(t *testing.T) {
 	addr := NewUint16(1)
 	var wg sync.WaitGroup
-	for i := 0; i < 512; i++ {
+	for i := 0; i < 16382; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -54,7 +54,7 @@ func TestAddUint16(t *testing.T) {
 func TestCompareAndSwapUint16(t *testing.T) {
 	addr := NewUint16(1)
 	var wg sync.WaitGroup
-	for i := 0; i < 512; i++ {
+	for i := 0; i < 16382; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -67,7 +67,7 @@ func TestCompareAndSwapUint16(t *testing.T) {
 func TestSwapUint16(t *testing.T) {
 	addr := NewUint16(1)
 	var wg sync.WaitGroup
-	for i := 0; i < 512; i++ {
+	for i := 0; i < 16382; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
