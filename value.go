@@ -66,9 +66,6 @@ func (v *Value) compareAndSwap(old, new interface{}) (swapped bool) {
 	typ := LoadPointer(&vp.typ)
 	if typ == nil {
 		// Attempt to start first store.
-		// Disable preemption so that other goroutines can use
-		// active spin wait to wait for completion; and so that
-		// GC does not see the fake type accidentally.
 		if !CompareAndSwapPointer(&vp.typ, nil, unsafe.Pointer(^uintptr(0))) {
 			return false
 		}
@@ -78,9 +75,7 @@ func (v *Value) compareAndSwap(old, new interface{}) (swapped bool) {
 		return
 	}
 	if uintptr(typ) == ^uintptr(0) {
-		// First store in progress. Wait.
-		// Since we disable preemption around the first store,
-		// we can wait with active spinning.
+		// First store in progress.
 		return false
 	}
 	if old == nil {
