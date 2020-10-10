@@ -63,40 +63,38 @@ func (v *Value) compareAndSwap(old, new interface{}) (swapped bool) {
 	}
 	vp := (*ifaceWords)(unsafe.Pointer(&v.v))
 	np := (*ifaceWords)(unsafe.Pointer(&new))
-	for {
-		typ := LoadPointer(&vp.typ)
-		if typ == nil {
-			// Attempt to start first store.
-			// Disable preemption so that other goroutines can use
-			// active spin wait to wait for completion; and so that
-			// GC does not see the fake type accidentally.
-			if !CompareAndSwapPointer(&vp.typ, nil, unsafe.Pointer(^uintptr(0))) {
-				return false
-			}
-			// Complete first store.
-			StorePointer(&vp.data, np.data)
-			StorePointer(&vp.typ, np.typ)
-			return
-		}
-		if uintptr(typ) == ^uintptr(0) {
-			// First store in progress. Wait.
-			// Since we disable preemption around the first store,
-			// we can wait with active spinning.
+	typ := LoadPointer(&vp.typ)
+	if typ == nil {
+		// Attempt to start first store.
+		// Disable preemption so that other goroutines can use
+		// active spin wait to wait for completion; and so that
+		// GC does not see the fake type accidentally.
+		if !CompareAndSwapPointer(&vp.typ, nil, unsafe.Pointer(^uintptr(0))) {
 			return false
 		}
-		if old == nil {
-			panic("github.com/hslam/atomic: old is nil")
-		}
-		// First store completed. Check type and overwrite data.
-		op := (*ifaceWords)(unsafe.Pointer(&old))
-		if typ != op.typ {
-			panic("github.com/hslam/atomic: old is inconsistently typed value")
-		}
-		if typ != np.typ {
-			panic("github.com/hslam/atomic: new is inconsistently typed value")
-		}
-		return atomic.CompareAndSwapPointer(&vp.data, op.data, np.data)
+		// Complete first store.
+		StorePointer(&vp.data, np.data)
+		StorePointer(&vp.typ, np.typ)
+		return
 	}
+	if uintptr(typ) == ^uintptr(0) {
+		// First store in progress. Wait.
+		// Since we disable preemption around the first store,
+		// we can wait with active spinning.
+		return false
+	}
+	if old == nil {
+		panic("github.com/hslam/atomic: old is nil")
+	}
+	// First store completed. Check type and overwrite data.
+	op := (*ifaceWords)(unsafe.Pointer(&old))
+	if typ != op.typ {
+		panic("github.com/hslam/atomic: old is inconsistently typed value")
+	}
+	if typ != np.typ {
+		panic("github.com/hslam/atomic: new is inconsistently typed value")
+	}
+	return atomic.CompareAndSwapPointer(&vp.data, op.data, np.data)
 }
 
 // Add atomically adds delta to *addr and returns the new value.
