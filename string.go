@@ -3,10 +3,6 @@
 
 package atomic
 
-import (
-	"sync/atomic"
-)
-
 // String represents an string.
 type String struct {
 	v Value
@@ -22,35 +18,28 @@ func NewString(val string) *String {
 // Swap atomically stores new into *addr and returns the previous *addr value.
 func (addr *String) Swap(new string) (old string) {
 	for {
-		old := addr.v.Load()
-		if addr.v.fastCompareAndSwap(old, new) {
-			return old.(string)
+		old = addr.Load()
+		if addr.CompareAndSwap(old, new) {
+			return
 		}
 	}
 }
 
 // CompareAndSwap executes the compare-and-swap operation for an string value.
 func (addr *String) CompareAndSwap(old, new string) (swapped bool) {
-	for {
-		if !atomic.CompareAndSwapUint32(&addr.v.seting, 0, 1) {
-			continue
-		}
-		if addr.Load() == old {
-			addr.Store(new)
-			atomic.StoreUint32(&addr.v.seting, 0)
-			return true
-		}
-		atomic.StoreUint32(&addr.v.seting, 0)
+	load := addr.v.Load()
+	if old != load {
 		return false
 	}
+	return addr.v.compareAndSwap(load, new)
 }
 
 // Add atomically adds delta to *addr and returns the new value.
 func (addr *String) Add(delta string) (new string) {
 	for {
-		old := addr.v.Load()
-		new = old.(string) + delta
-		if addr.v.fastCompareAndSwap(old, new) {
+		old := addr.Load()
+		new = old + delta
+		if addr.CompareAndSwap(old, new) {
 			return
 		}
 	}

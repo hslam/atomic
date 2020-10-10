@@ -8,16 +8,18 @@ import (
 // AddFunc is a add function.
 type AddFunc func(old, delta interface{}) (new interface{})
 
+// EqualFunc is a equal function.
+type EqualFunc func(old, load interface{}) (equal bool)
+
 // Value provides an atomic load and store of a consistently typed value.
 // The zero value for a Value returns nil from Load.
 // Once Store has been called, a Value must not be copied.
 //
 // A Value must not be copied after first use.
 type Value struct {
-	fast    bool
-	v       atomic.Value
-	seting  uint32
-	AddFunc AddFunc
+	v         atomic.Value
+	EqualFunc EqualFunc
+	AddFunc   AddFunc
 }
 
 // ifaceWords is interface{} internal representation.
@@ -27,15 +29,8 @@ type ifaceWords struct {
 }
 
 // NewValue returns a new Value.
-func NewValue(val interface{}, addFunc AddFunc) *Value {
-	addr := &Value{AddFunc: addFunc}
-	addr.Store(val)
-	return addr
-}
-
-// NewFastValue returns a new FastValue.
-func NewFastValue(val interface{}, addFunc AddFunc) *Value {
-	addr := &Value{AddFunc: addFunc, fast: true}
+func NewValue(val interface{}, equalFunc EqualFunc, addFunc AddFunc) *Value {
+	addr := &Value{EqualFunc: equalFunc, AddFunc: addFunc}
 	addr.Store(val)
 	return addr
 }
@@ -52,24 +47,17 @@ func (v *Value) Swap(new interface{}) (old interface{}) {
 
 // CompareAndSwap executes the compare-and-swap operation for an interface{} value.
 func (v *Value) CompareAndSwap(old, new interface{}) (swapped bool) {
-	if v.fast {
-		return v.fastCompareAndSwap(old, new)
+	if v.EqualFunc == nil {
+		panic("EqualFunc is nil")
 	}
-	for {
-		if !atomic.CompareAndSwapUint32(&v.seting, 0, 1) {
-			continue
-		}
-		if v.Load() == old {
-			v.Store(new)
-			atomic.StoreUint32(&v.seting, 0)
-			return true
-		}
-		atomic.StoreUint32(&v.seting, 0)
+	load := v.Load()
+	if !v.EqualFunc(old, load) {
 		return false
 	}
+	return v.compareAndSwap(load, new)
 }
 
-func (v *Value) fastCompareAndSwap(old, new interface{}) (swapped bool) {
+func (v *Value) compareAndSwap(old, new interface{}) (swapped bool) {
 	if new == nil {
 		panic("github.com/hslam/atomic: new is nil")
 	}

@@ -7,137 +7,13 @@ import (
 
 func TestValue(t *testing.T) {
 	var val = "Hello World"
+	var equalFunc EqualFunc = func(old, load interface{}) (equal bool) {
+		return old == load
+	}
 	var addFunc AddFunc = func(old, delta interface{}) (new interface{}) {
 		return old.(string) + delta.(string)
 	}
-	addr := NewValue(val, addFunc)
-	if addr.Load() != val {
-		t.Error(addr.Load())
-	}
-	addr.Store(val[:5])
-	if addr.Load().(string) != val[:5] {
-		t.Error(addr.Load())
-	}
-	var delta = val[5:]
-	if addr.Add(delta) != val {
-		t.Error(addr.Load())
-	}
-	if addr.Load() != val {
-		t.Error(addr.Load())
-	}
-	var new = "Foo"
-	if addr.Swap(new) != val {
-		t.Error(addr.Load())
-	}
-	var old = new
-	new = "Bar"
-	if !addr.CompareAndSwap(old, new) {
-		t.Error(addr.Load())
-	}
-	if addr.CompareAndSwap(old, new) {
-		t.Error(addr.Load())
-	}
-	addr = &Value{}
-	if addr.Load() != nil {
-		t.Error(addr.Load())
-	}
-}
-
-func TestAddValue(t *testing.T) {
-	var addFunc AddFunc = func(old, delta interface{}) (new interface{}) {
-		return old.(string) + delta.(string)
-	}
-	addr := NewValue("", nil)
-	func() {
-		defer func() {
-			if err := recover(); err == nil {
-				t.Error("should panic")
-			}
-		}()
-		addr.Add("")
-	}()
-	addr.AddFunc = addFunc
-	var wg sync.WaitGroup
-	for i := 0; i < 8192; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			addr.Add("")
-		}()
-	}
-	wg.Wait()
-}
-
-func TestCompareAndSwapValue(t *testing.T) {
-	addr := NewValue("", nil)
-	var wg sync.WaitGroup
-	for i := 0; i < 8192; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			addr.CompareAndSwap("", "")
-		}()
-	}
-	wg.Wait()
-}
-
-func TestSwapValue(t *testing.T) {
-	addr := NewValue("", nil)
-	var wg sync.WaitGroup
-	for i := 0; i < 8192; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			addr.Swap("")
-		}()
-	}
-	wg.Wait()
-}
-
-func BenchmarkSwapValue(b *testing.B) {
-	addr := NewValue("", nil)
-	for i := 0; i < b.N; i++ {
-		addr.Swap("")
-	}
-}
-
-func BenchmarkCompareAndSwapValue(b *testing.B) {
-	addr := NewValue("", nil)
-	for i := 0; i < b.N; i++ {
-		addr.CompareAndSwap("", "")
-	}
-}
-
-func BenchmarkAddValue(b *testing.B) {
-	var addFunc AddFunc = func(old, delta interface{}) (new interface{}) {
-		return old.(string) + delta.(string)
-	}
-	addr := NewValue("", addFunc)
-	for i := 0; i < b.N; i++ {
-		addr.Add("")
-	}
-}
-
-func BenchmarkStoreValue(b *testing.B) {
-	addr := NewValue("", nil)
-	for i := 0; i < b.N; i++ {
-		addr.Store("")
-	}
-}
-
-func BenchmarkLoadValue(b *testing.B) {
-	addr := NewValue("", nil)
-	for i := 0; i < b.N; i++ {
-		addr.Load()
-	}
-}
-
-func TestFastValue(t *testing.T) {
-	var val = "Hello World"
-	var addFunc AddFunc = func(old, delta interface{}) (new interface{}) {
-		return old.(string) + delta.(string)
-	}
-	addr := NewFastValue(val, addFunc)
+	addr := NewValue(val, equalFunc, addFunc)
 	if addr.Load() != val {
 		t.Error(addr.Load())
 	}
@@ -164,17 +40,20 @@ func TestFastValue(t *testing.T) {
 	if addr.CompareAndSwap(old, new) {
 		t.Error(addr.Load())
 	}
-	addr = &Value{fast: true}
+	addr = &Value{}
 	if addr.Load() != nil {
 		t.Error(addr.Load())
 	}
 }
 
-func TestAddFastValue(t *testing.T) {
+func TestAddValue(t *testing.T) {
+	var equalFunc EqualFunc = func(old, load interface{}) (equal bool) {
+		return old == load
+	}
 	var addFunc AddFunc = func(old, delta interface{}) (new interface{}) {
 		return old.(string) + delta.(string)
 	}
-	addr := NewFastValue("", nil)
+	addr := NewValue("", equalFunc, nil)
 	func() {
 		defer func() {
 			if err := recover(); err == nil {
@@ -185,7 +64,7 @@ func TestAddFastValue(t *testing.T) {
 	}()
 	addr.AddFunc = addFunc
 	var wg sync.WaitGroup
-	for i := 0; i < 8192; i++ {
+	for i := 0; i < 16382; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -195,40 +74,56 @@ func TestAddFastValue(t *testing.T) {
 	wg.Wait()
 }
 
-func testCompareAndSwapFastValue(t *testing.T) {
-	addr := &Value{fast: true}
+func testCompareAndSwapValue(t *testing.T) {
+	var equalFunc EqualFunc = func(old, load interface{}) (equal bool) {
+		return old == load
+	}
+	addr := &Value{EqualFunc: equalFunc}
 	var wg sync.WaitGroup
 	for i := 0; i < 64; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			addr.CompareAndSwap("", "")
+			addr.compareAndSwap("", "")
 		}()
 	}
 	wg.Wait()
 }
 
-func TestCompareAndSwapFastValue(t *testing.T) {
-	for i := 0; i < 8192; i++ {
-		testCompareAndSwapFastValue(t)
+func TestCompareAndSwapValue(t *testing.T) {
+	for i := 0; i < 16382; i++ {
+		testCompareAndSwapValue(t)
 	}
-	addr := &Value{fast: true}
+
+	addr := &Value{}
 	func() {
 		defer func() {
 			if err := recover(); err == nil {
 				t.Error("should panic")
 			}
 		}()
-		addr.CompareAndSwap("", nil)
+		addr.CompareAndSwap("", "")
 	}()
-	addr.CompareAndSwap("", "")
+	var equalFunc EqualFunc = func(old, load interface{}) (equal bool) {
+		return old == load
+	}
+	addr.EqualFunc = equalFunc
 	func() {
 		defer func() {
 			if err := recover(); err == nil {
 				t.Error("should panic")
 			}
 		}()
-		addr.CompareAndSwap(nil, "")
+		addr.compareAndSwap("", nil)
+	}()
+	addr.compareAndSwap("", "")
+	func() {
+		defer func() {
+			if err := recover(); err == nil {
+				t.Error("should panic")
+			}
+		}()
+		addr.compareAndSwap(nil, "")
 	}()
 	func() {
 		defer func() {
@@ -236,7 +131,7 @@ func TestCompareAndSwapFastValue(t *testing.T) {
 				t.Error("should panic")
 			}
 		}()
-		addr.CompareAndSwap(1, "")
+		addr.compareAndSwap(1, "")
 	}()
 	func() {
 		defer func() {
@@ -244,14 +139,17 @@ func TestCompareAndSwapFastValue(t *testing.T) {
 				t.Error("should panic")
 			}
 		}()
-		addr.CompareAndSwap("", 1)
+		addr.compareAndSwap("", 1)
 	}()
 }
 
-func TestSwapFastValue(t *testing.T) {
-	addr := NewValue("", nil)
+func TestSwapValue(t *testing.T) {
+	var equalFunc EqualFunc = func(old, load interface{}) (equal bool) {
+		return old == load
+	}
+	addr := NewValue("", equalFunc, nil)
 	var wg sync.WaitGroup
-	for i := 0; i < 8192; i++ {
+	for i := 0; i < 16382; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -261,39 +159,48 @@ func TestSwapFastValue(t *testing.T) {
 	wg.Wait()
 }
 
-func BenchmarkSwapFastValue(b *testing.B) {
-	addr := NewFastValue("", nil)
+func BenchmarkSwapValue(b *testing.B) {
+	var equalFunc EqualFunc = func(old, load interface{}) (equal bool) {
+		return old == load
+	}
+	addr := NewValue("", equalFunc, nil)
 	for i := 0; i < b.N; i++ {
 		addr.Swap("")
 	}
 }
 
-func BenchmarkCompareAndSwapFastValue(b *testing.B) {
-	addr := NewFastValue("", nil)
+func BenchmarkCompareAndSwapValue(b *testing.B) {
+	var equalFunc EqualFunc = func(old, load interface{}) (equal bool) {
+		return old == load
+	}
+	addr := NewValue("", equalFunc, nil)
 	for i := 0; i < b.N; i++ {
 		addr.CompareAndSwap("", "")
 	}
 }
 
-func BenchmarkAddFastValue(b *testing.B) {
+func BenchmarkAddValue(b *testing.B) {
+	var equalFunc EqualFunc = func(old, load interface{}) (equal bool) {
+		return old == load
+	}
 	var addFunc AddFunc = func(old, delta interface{}) (new interface{}) {
 		return old.(string) + delta.(string)
 	}
-	addr := NewFastValue("", addFunc)
+	addr := NewValue("", equalFunc, addFunc)
 	for i := 0; i < b.N; i++ {
 		addr.Add("")
 	}
 }
 
-func BenchmarkStoreFastValue(b *testing.B) {
-	addr := NewFastValue("", nil)
+func BenchmarkStoreValue(b *testing.B) {
+	addr := NewValue("", nil, nil)
 	for i := 0; i < b.N; i++ {
 		addr.Store("")
 	}
 }
 
-func BenchmarkLoadFastValue(b *testing.B) {
-	addr := NewFastValue("", nil)
+func BenchmarkLoadValue(b *testing.B) {
+	addr := NewValue("", nil, nil)
 	for i := 0; i < b.N; i++ {
 		addr.Load()
 	}

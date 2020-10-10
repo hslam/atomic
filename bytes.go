@@ -5,7 +5,6 @@ package atomic
 
 import (
 	"bytes"
-	"sync/atomic"
 )
 
 // Bytes represents an []byte.
@@ -23,35 +22,28 @@ func NewBytes(val []byte) *Bytes {
 // Swap atomically stores new into *addr and returns the previous *addr value.
 func (addr *Bytes) Swap(new []byte) (old []byte) {
 	for {
-		old := addr.v.Load()
-		if addr.v.fastCompareAndSwap(old, new) {
-			return old.([]byte)
+		old = addr.Load()
+		if addr.CompareAndSwap(old, new) {
+			return
 		}
 	}
 }
 
 // CompareAndSwap executes the compare-and-swap operation for an []byte value.
 func (addr *Bytes) CompareAndSwap(old, new []byte) (swapped bool) {
-	for {
-		if !atomic.CompareAndSwapUint32(&addr.v.seting, 0, 1) {
-			continue
-		}
-		if bytes.Equal(addr.Load(), old) {
-			addr.Store(new)
-			atomic.StoreUint32(&addr.v.seting, 0)
-			return true
-		}
-		atomic.StoreUint32(&addr.v.seting, 0)
+	load := addr.v.Load()
+	if !bytes.Equal(old, load.([]byte)) {
 		return false
 	}
+	return addr.v.compareAndSwap(load, new)
 }
 
 // Add atomically adds delta to *addr and returns the new value.
 func (addr *Bytes) Add(delta []byte) (new []byte) {
 	for {
-		old := addr.v.Load()
-		new = append(old.([]byte), delta...)
-		if addr.v.fastCompareAndSwap(old, new) {
+		old := addr.Load()
+		new = append(old, delta...)
+		if addr.CompareAndSwap(old, new) {
 			return
 		}
 	}
