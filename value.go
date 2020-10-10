@@ -81,7 +81,7 @@ func (v *Value) compareAndSwap(old, new interface{}) (swapped bool) {
 	if old == nil {
 		panic("github.com/hslam/atomic: old is nil")
 	}
-	// First store completed. Check type and overwrite data.
+	// First store completed. Check type.
 	op := (*ifaceWords)(unsafe.Pointer(&old))
 	if typ != op.typ {
 		panic("github.com/hslam/atomic: old is inconsistently typed value")
