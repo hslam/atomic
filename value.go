@@ -39,7 +39,7 @@ func NewValue(val interface{}, equalFunc EqualFunc, addFunc AddFunc) *Value {
 func (v *Value) Swap(new interface{}) (old interface{}) {
 	for {
 		old = v.Load()
-		if v.CompareAndSwap(old, new) {
+		if v.compareAndSwap(old, new) {
 			return
 		}
 	}
@@ -100,7 +100,7 @@ func (v *Value) Add(delta interface{}) (new interface{}) {
 	for {
 		old := v.Load()
 		new = v.AddFunc(old, delta)
-		if v.CompareAndSwap(old, new) {
+		if v.compareAndSwap(old, new) {
 			return
 		}
 	}
