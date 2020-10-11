@@ -97,7 +97,6 @@ func TestCompareAndSwapValue(t *testing.T) {
 	for i := 0; i < 16382; i++ {
 		testCompareAndSwapValue(t)
 	}
-
 	addr := &Value{}
 	func() {
 		defer func() {

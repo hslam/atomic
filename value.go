@@ -60,6 +60,7 @@ func (v *Value) CompareAndSwap(old, new interface{}) (swapped bool) {
 	return v.compareAndSwap(load, new)
 }
 
+// compareAndSwap executes the compare-and-swap operation for an interface{} value.
 func (v *Value) compareAndSwap(old, new interface{}) (swapped bool) {
 	if new == nil {
 		panic("github.com/hslam/atomic: new is nil")
