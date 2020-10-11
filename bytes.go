@@ -4,8 +4,16 @@
 package atomic
 
 import (
-	"bytes"
+	"unsafe"
 )
+
+// bytesEqual reports whether a and b
+// are the same length and contain the same bytes.
+// A nil argument is equivalent to an empty slice.
+func bytesEqual(a, b []byte) bool {
+	// Neither cmd/compile nor gccgo allocates for these string conversions.
+	return *(*string)(unsafe.Pointer(&a)) == *(*string)(unsafe.Pointer(&b))
+}
 
 // Bytes represents an []byte.
 type Bytes struct {
@@ -32,7 +40,7 @@ func (addr *Bytes) Swap(new []byte) (old []byte) {
 // CompareAndSwap executes the compare-and-swap operation for an []byte value.
 func (addr *Bytes) CompareAndSwap(old, new []byte) (swapped bool) {
 	load := addr.v.Load()
-	if !bytes.Equal(old, load.([]byte)) {
+	if !bytesEqual(old, load.([]byte)) {
 		return false
 	}
 	return addr.v.compareAndSwap(load, new)

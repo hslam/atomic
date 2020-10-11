@@ -4,30 +4,37 @@
 package atomic
 
 import (
-	"bytes"
 	"sync"
 	"testing"
 )
 
+func TestBytesEqual(t *testing.T) {
+	var a = []byte{1, 2, 3}
+	var b = []byte{1, 2, 3}
+	if !bytesEqual(a, b) {
+		t.Error("fail")
+	}
+}
+
 func TestBytes(t *testing.T) {
 	var val = []byte{1, 2, 3}
 	addr := NewBytes(val)
-	if !bytes.Equal(addr.Load(), val) {
+	if !bytesEqual(addr.Load(), val) {
 		t.Error(addr.Load())
 	}
 	addr.Store(val[:2])
-	if !bytes.Equal(addr.Load(), val[:2]) {
+	if !bytesEqual(addr.Load(), val[:2]) {
 		t.Error(addr.Load())
 	}
 	var delta = val[2:]
-	if !bytes.Equal(addr.Add(delta), val) {
+	if !bytesEqual(addr.Add(delta), val) {
 		t.Error(addr.Load())
 	}
-	if !bytes.Equal(addr.Load(), val) {
+	if !bytesEqual(addr.Load(), val) {
 		t.Error(addr.Load())
 	}
 	var new = []byte{4, 5, 6}
-	if !bytes.Equal(addr.Swap(new), val) {
+	if !bytesEqual(addr.Swap(new), val) {
 		t.Error(addr.Load())
 	}
 	var old = new
@@ -40,7 +47,7 @@ func TestBytes(t *testing.T) {
 	}
 
 	addr = &Bytes{}
-	if addr.Load() != nil || !bytes.Equal(addr.Load(), []byte{}) {
+	if addr.Load() != nil || !bytesEqual(addr.Load(), []byte{}) {
 		t.Error(addr.Load())
 	}
 }
