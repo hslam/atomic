@@ -1,6 +1,6 @@
 # atomic
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/hslam/atomic)](https://pkg.go.dev/github.com/hslam/atomic)
-[![Build Status](https://travis-ci.org/hslam/atomic.svg?branch=master)](https://travis-ci.org/hslam/atomic)
+[![Build Status](https://github.com/hslam/atomic/workflows/build/badge.svg)](https://github.com/hslam/atomic/actions)
 [![codecov](https://codecov.io/gh/hslam/atomic/branch/master/graph/badge.svg)](https://codecov.io/gh/hslam/atomic)
 [![Go Report Card](https://goreportcard.com/badge/github.com/hslam/atomic)](https://goreportcard.com/report/github.com/hslam/atomic)
 [![LICENSE](https://img.shields.io/github/license/hslam/atomic.svg?style=flat-square)](https://github.com/hslam/atomic/blob/master/LICENSE)
