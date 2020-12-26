@@ -37,7 +37,7 @@ import "github.com/hslam/atomic"
 ```
 ### Usage
 #### Example
-```
+```go
 package main
 
 import (
